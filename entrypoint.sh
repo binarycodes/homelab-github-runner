@@ -19,7 +19,7 @@ set -euo pipefail
 
 cleanup() {
   echo "Removing runner ${GH_RUNNER_NAME}..."
-  ./config.sh remove --unattended || true
+  ./config.sh remove --unattended
 }
 trap cleanup EXIT
 
