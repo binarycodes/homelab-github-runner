@@ -1,12 +1,16 @@
 FROM debian:stable-slim
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG RUNNER_VERSION=2.330.0
+
 # Base deps
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      curl ca-certificates git jq \
+    curl ca-certificates git jq \
+    libicu76 libicu-dev libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-ARG RUNNER_VERSION=2.319.1
 
 # Create non-root user + home
 RUN useradd -m -d /home/runner -s /bin/bash runner
@@ -31,3 +35,7 @@ USER runner
 WORKDIR /home/runner/actions-runner
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+LABEL org.opencontainers.image.title="homelab-github-runner" \
+      org.opencontainers.image.description="Ephemeral GitHub Actions runner used in homelab" \
+      org.opencontainers.image.version="${RUNNER_VERSION}" \

@@ -9,7 +9,7 @@ env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
   PROJECT_DIR: .
-  RUNNER_VERSION: 2.319.1
+  RUNNER_VERSION: 2.330.0
 
 jobs:
   build:
@@ -43,9 +43,10 @@ jobs:
           tags: |
             # set latest tag for default branch
             type=raw,value=latest,enable={{is_default_branch}}
-            type=semver,pattern=${{ env.RUNNER_VERSION }}
+            type=semver,pattern={{version}},value=${{ env.RUNNER_VERSION }}
 
       - name: build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: ${{ env.PROJECT_DIR }}
@@ -69,8 +70,14 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          IMAGE: ${{ env.IMAGE_NAME }}
         run: |
+          # strict signing - immutable digest reference
+          DIGEST_REF="${IMAGE}@${DIGEST}"
+          echo "Signing digest reference: ${DIGEST_REF}"
+          cosign sign --key cosign.key --yes "${DIGEST_REF}"
+
           echo "${TAGS}" | while read tag; do
             cosign sign --key cosign.key --yes $tag
           done
