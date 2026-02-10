@@ -2,7 +2,7 @@ variable "REGISTRY" { default = "docker.io" }
 variable "NAMESPACE"  { default = "binarycodes" }
 variable "IMAGE_NAME" { default = "github-runner" }
 
-variable "GH_RUNNER_VERSION" { default = "2.330.0" }
+variable "GH_RUNNER_VERSION" { default = "2.331.0" }
 
 group "default" {
   targets = ["image"]
