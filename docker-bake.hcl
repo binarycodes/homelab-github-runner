@@ -2,8 +2,8 @@ variable "REGISTRY" { default = "docker.io" }
 variable "NAMESPACE"  { default = "binarycodes" }
 variable "IMAGE_NAME" { default = "github-runner" }
 
-variable "GH_RUNNER_VERSION" { default = "2.333.1" }
-variable "GH_RUNNER_CHECKSUM" { default = "18f8f68ed1892854ff2ab1bab4fcaa2f5abeedc98093b6cb13638991725cab74" }
+variable "GH_RUNNER_VERSION" { default = "2.335.1" }
+variable "GH_RUNNER_CHECKSUM" { default = "4ef2f25285f0ae4477f1fe1e346db76d2f3ebf03824e2ddd1973a2819bf6c8cf" }
 
 variable "LOCAL" { default = false }
 
