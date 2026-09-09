@@ -41,6 +41,7 @@ jobs:
           private-key: ${{ secrets.CLOUDYHOME_BOT_PRIVATE_KEY }}
 
       - name: open the pull request
+        id: pr
         if: steps.bump.outputs.version != ''
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
@@ -52,3 +53,12 @@ jobs:
             Release notes: https://github.com/actions/runner/releases/tag/v${{ steps.bump.outputs.version }}
 
             Opened by the `bump the runner version` workflow; the build check verifies the new checksums.
+
+      # auto-merge survives later pushes to the branch, so an updated PR keeps it
+      - name: enable auto-merge
+        if: steps.pr.outputs.pull-request-operation == 'created'
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ steps.pr.outputs.pull-request-number }}
+        run: gh pr merge --auto --squash "$NUMBER"
