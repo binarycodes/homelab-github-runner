@@ -2,7 +2,7 @@ ARG RUNNER_VERSION="unknown"
 ARG RUNNER_CHECKSUM="unknown"
 ARG RUNNER_USER="runner"
 
-FROM debian:13-slim
+FROM debian:13-slim@sha256:d7e12182ce18b85b93007c1dedf31f2d29e01ccf3182cc4017c709b6259bc132
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
 ARG RUNNER_VERSION
