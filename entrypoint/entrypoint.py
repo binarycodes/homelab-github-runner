@@ -54,8 +54,7 @@ class Settings:
             installation_id=env["GH_APP_INSTALLATION_ID"],
             private_key_file=Path(env["GH_APP_PRIVATE_KEY_FILE"]),
             labels=env.get("GH_RUNNER_LABELS") or "self-hosted",
-            name=env.get("GH_RUNNER_NAME")
-            or f"ephemeral-{socket.gethostname()}-{random.randrange(32768)}",
+            name=env.get("GH_RUNNER_NAME") or f"ephemeral-{socket.gethostname()}-{random.randrange(32768)}",
         )
 
 

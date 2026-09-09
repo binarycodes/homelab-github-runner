@@ -23,3 +23,11 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: build
+
+  - package-ecosystem: pip
+    directory: /entrypoint
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: ci

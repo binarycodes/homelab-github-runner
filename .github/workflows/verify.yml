@@ -28,7 +28,16 @@ jobs:
           config: .hadolint.yaml
 
       - name: lint the shell scripts
-        run: shellcheck entrypoint.sh
+        run: shellcheck .githooks/commit-msg
+
+      - name: lint and test the entrypoint
+        working-directory: entrypoint
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet --requirement requirements-dev.txt
+          .venv/bin/ruff check .
+          .venv/bin/ruff format --check .
+          .venv/bin/pytest
 
   build:
     name: build the image and smoke-test it
@@ -76,7 +85,7 @@ jobs:
           if output=$(docker run --rm "$image" 2>&1); then
             echo "entrypoint started without GH_RUNNER_URL"; exit 1
           fi
-          grep -q 'need GH_RUNNER_URL' <<<"$output"
+          grep -q 'missing environment: GH_RUNNER_URL' <<<"$output"
 
           # workflows rely on passwordless apt-get through sudo
           docker run --rm --entrypoint sudo "$image" -n apt-get --version > /dev/null
