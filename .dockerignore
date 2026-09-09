@@ -2,4 +2,6 @@
 .github
 .githooks
 .idea
+.venv
 docs
+entrypoint/test

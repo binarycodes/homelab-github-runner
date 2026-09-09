@@ -48,9 +48,9 @@ RUN apt-get update \
     jq \
     make \
     openssh-client \
-    openssl \
     packer \
     python3 \
+    python3-cryptography \
     python3-pip \
     python3-venv \
     shellcheck \
@@ -77,9 +77,9 @@ RUN "/home/${RUNNER_USER}/actions-runner/bin/installdependencies.sh" \
     && apt-get autoclean \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-COPY --chmod=0755 entrypoint.sh /entrypoint.sh
+COPY --chmod=0755 entrypoint/entrypoint.py /entrypoint.py
 
 USER "${RUNNER_USER}"
 WORKDIR "/home/${RUNNER_USER}/actions-runner"
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.py"]
