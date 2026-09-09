@@ -30,6 +30,7 @@ RUN [ "${RUNNER_VERSION}" != "unknown" ] || { echo "ERROR: RUNNER_VERSION is not
     libssl-dev \
     make \
     openssh-client \
+    openssl \
     packer \
     python3 \
     python3-pip \
