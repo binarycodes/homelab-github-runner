@@ -87,8 +87,15 @@ jobs:
           fi
           grep -q 'missing environment: GH_RUNNER_URL' <<<"$output"
 
-          # workflows rely on passwordless apt-get through sudo
-          docker run --rm --entrypoint sudo "$image" -n apt-get --version > /dev/null
+          # workflows install packages through the apt-install wrapper, and nothing
+          # else may escalate
+          docker run --rm --entrypoint sudo "$image" -n apt-install hello > /dev/null
+          if docker run --rm --entrypoint sudo "$image" -n apt-install -o Dpkg::Pre-Install-Pkgs::=id 2> /dev/null; then
+            echo "apt-install accepted an apt-get option"; exit 1
+          fi
+          if docker run --rm --entrypoint sudo "$image" -n apt-get --version 2> /dev/null; then
+            echo "sudo permits apt-get directly"; exit 1
+          fi
 
   # the single required status check for branch protection
   verified:

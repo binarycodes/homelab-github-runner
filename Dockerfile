@@ -63,12 +63,11 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# create non-root user
+# the runner user may escalate only through apt-install, which limits it to
+# installing packages; apt-get itself would let workflows run anything as root
+COPY --chmod=0755 tools/apt_install.py /usr/local/bin/apt-install
 RUN useradd -m -s /bin/bash "${RUNNER_USER}" \
-    && usermod -aG sudo "${RUNNER_USER}" \
-    && printf '%s\n' \
-        'Defaults env_keep += "DEBIAN_FRONTEND"' \
-        "${RUNNER_USER} ALL=(ALL) NOPASSWD: /usr/bin/apt-get" > /etc/sudoers.d/10-runner-conf \
+    && echo "${RUNNER_USER} ALL=(root) NOPASSWD: /usr/local/bin/apt-install" > /etc/sudoers.d/10-runner-conf \
     && chmod 0440 /etc/sudoers.d/10-runner-conf \
     && visudo -cf /etc/sudoers.d/10-runner-conf
 
