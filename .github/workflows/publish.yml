@@ -5,6 +5,14 @@ on:
   push:
     branches:
       - main
+    # Only inputs of the image; workflow-only or actions-bump commits must not republish it.
+    paths:
+      - Dockerfile
+      - docker-bake.hcl
+      - .dockerignore
+      - tools/**
+      - '!tools/test/**'
+      - .github/workflows/publish.yml
   schedule:
     # Weekly rebuild so apt security fixes ship between base-digest bumps.
     - cron: '23 4 * * 3'
