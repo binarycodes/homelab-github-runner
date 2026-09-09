@@ -99,4 +99,7 @@ echo "Configuring runner '${GH_RUNNER_NAME}'..."
   --disableupdate \
   --replace
 
-./run.sh
+# run.sh only relays SIGTERM/SIGINT to the listener when this is set; otherwise
+# a container stop kills the shell and orphans a running job.
+export RUNNER_MANUALLY_TRAP_SIG=1
+exec ./run.sh
