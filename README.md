@@ -85,3 +85,7 @@ cosign verify docker.io/binarycodes/github-runner:latest \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   --certificate-identity https://github.com/cloudyhomelab/homelab-github-runner/.github/workflows/build.yml@refs/heads/main
 ```
+
+## License
+
+[GNU General Public License v3.0 or later](LICENSE).
