@@ -66,9 +66,7 @@ def create_jwt(app_id: str, private_key_pem: bytes, now: int | None = None) -> s
     now = int(time.time()) if now is None else now
     header = {"alg": "RS256", "typ": "JWT"}
     claims = {"iat": now - 60, "exp": now + 540, "iss": app_id}
-    unsigned = ".".join(
-        b64url(json.dumps(part, separators=(",", ":")).encode()) for part in (header, claims)
-    )
+    unsigned = ".".join(b64url(json.dumps(part, separators=(",", ":")).encode()) for part in (header, claims))
     key = serialization.load_pem_private_key(private_key_pem, password=None)
     signature = key.sign(unsigned.encode(), padding.PKCS1v15(), hashes.SHA256())
     return f"{unsigned}.{b64url(signature)}"
@@ -82,16 +80,13 @@ def runner_api_prefix(runner_url: str) -> str:
     parts = [part for part in parsed.path.split("/") if part]
     if parts and parts[0] == "enterprises":
         raise ConfigError(
-            "GH_RUNNER_URL points at an enterprise; a GitHub App installation cannot "
-            "register enterprise runners"
+            "GH_RUNNER_URL points at an enterprise; a GitHub App installation cannot register enterprise runners"
         )
     if len(parts) == 1:
         return f"orgs/{parts[0]}"
     if len(parts) == 2:
         return f"repos/{parts[0]}/{parts[1]}"
-    raise ConfigError(
-        f"GH_RUNNER_URL must name an organization or a repository, got {runner_url!r}"
-    )
+    raise ConfigError(f"GH_RUNNER_URL must name an organization or a repository, got {runner_url!r}")
 
 
 def runner_token_url(runner_url: str, kind: str) -> str:

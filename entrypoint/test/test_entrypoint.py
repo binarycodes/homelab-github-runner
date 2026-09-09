@@ -54,9 +54,7 @@ class TestSettings:
     def test_reports_every_missing_variable_at_once(self):
         with pytest.raises(entrypoint.ConfigError) as info:
             entrypoint.Settings.from_env({"GH_APP_ID": "1", "GH_APP_INSTALLATION_ID": ""})
-        assert str(info.value) == (
-            "missing environment: GH_RUNNER_URL GH_APP_INSTALLATION_ID GH_APP_PRIVATE_KEY_FILE"
-        )
+        assert str(info.value) == ("missing environment: GH_RUNNER_URL GH_APP_INSTALLATION_ID GH_APP_PRIVATE_KEY_FILE")
 
 
 class TestCreateJwt:
@@ -151,9 +149,7 @@ class TestPostJson:
 
     def test_http_error_includes_status_and_body(self, monkeypatch):
         def fake_urlopen(request, timeout):
-            raise urllib.error.HTTPError(
-                request.full_url, 404, "Not Found", {}, io.BytesIO(b'{"message":"Not Found"}')
-            )
+            raise urllib.error.HTTPError(request.full_url, 404, "Not Found", {}, io.BytesIO(b'{"message":"Not Found"}'))
 
         monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
         with pytest.raises(entrypoint.ApiError, match=r'HTTP 404: \{"message":"Not Found"\}'):
