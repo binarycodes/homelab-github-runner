@@ -57,6 +57,7 @@ RUN apt-get update \
     sudo \
     terraform \
     unzip \
+    zstd \
     && apt-get -y autoremove \
     && apt-get autoclean \
     && apt-get clean \
