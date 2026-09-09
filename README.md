@@ -77,13 +77,13 @@ Anything else under `sudo` is denied.
 
 ## Verifying the image
 
-Images are signed keyless with cosign from this repository's `build.yml` on
+Images are signed keyless with cosign from this repository's `publish.yml` on
 `main`, and carry SBOM and provenance attestations:
 
 ```sh
 cosign verify docker.io/binarycodes/github-runner:latest \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity https://github.com/cloudyhomelab/homelab-github-runner/.github/workflows/build.yml@refs/heads/main
+  --certificate-identity https://github.com/cloudyhomelab/homelab-github-runner/.github/workflows/publish.yml@refs/heads/main
 ```
 
 ## License

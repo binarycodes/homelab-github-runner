@@ -1,10 +1,13 @@
-name: build and push github runner image
+name: build and publish github runner image
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+  schedule:
+    # Weekly rebuild so apt security fixes ship between base-digest bumps.
+    - cron: '23 4 * * 3'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,7 +16,8 @@ env:
   REGISTRY: docker.io
 
 jobs:
-  build:
+  publish:
+    name: build and publish the image
     runs-on: ubuntu-latest
 
     permissions:
