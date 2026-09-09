@@ -1,18 +1,20 @@
 ARG RUNNER_VERSION="unknown"
-ARG RUNNER_CHECKSUM="unknown"
+ARG RUNNER_CHECKSUM_X64="unknown"
+ARG RUNNER_CHECKSUM_ARM64="unknown"
 ARG RUNNER_USER="runner"
 
 FROM debian:13-slim@sha256:d7e12182ce18b85b93007c1dedf31f2d29e01ccf3182cc4017c709b6259bc132
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
+ARG TARGETARCH
 ARG RUNNER_VERSION
-ARG RUNNER_CHECKSUM
+ARG RUNNER_CHECKSUM_X64
+ARG RUNNER_CHECKSUM_ARM64
 ARG RUNNER_USER
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN [ "${RUNNER_VERSION}" != "unknown" ] || { echo "ERROR: RUNNER_VERSION is not set"; exit 2; }; \
-    [ "${RUNNER_CHECKSUM}" != "unknown" ] || { echo "ERROR: RUNNER_CHECKSUM is not set"; exit 2; }; \
     apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl gpg lsb-release \
     && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg - \
@@ -50,9 +52,16 @@ RUN useradd -m -s /bin/bash "${RUNNER_USER}" \
 # install github actions runner as root
 WORKDIR "/home/${RUNNER_USER}/actions-runner"
 
-RUN curl -fsSL --retry 3 --retry-all-errors -o actions-runner.tar.gz \
-    "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz" \
-    && printf '%s  actions-runner.tar.gz\n' "${RUNNER_CHECKSUM#sha256:}" | sha256sum -c - \
+# buildx reports amd64; the runner names that tarball x64
+RUN case "${TARGETARCH:-}" in \
+        amd64) runner_arch="x64";   checksum="${RUNNER_CHECKSUM_X64}" ;; \
+        arm64) runner_arch="arm64"; checksum="${RUNNER_CHECKSUM_ARM64}" ;; \
+        *) echo "ERROR: unsupported TARGETARCH '${TARGETARCH:-}' (build with buildx)"; exit 2 ;; \
+    esac; \
+    [ "${checksum}" != "unknown" ] || { echo "ERROR: RUNNER_CHECKSUM for ${runner_arch} is not set"; exit 2; }; \
+    curl -fsSL --retry 3 --retry-all-errors -o actions-runner.tar.gz \
+    "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${runner_arch}-${RUNNER_VERSION}.tar.gz" \
+    && printf '%s  actions-runner.tar.gz\n' "${checksum#sha256:}" | sha256sum -c - \
     && tar xzf actions-runner.tar.gz \
     && rm actions-runner.tar.gz \
     && ./bin/installdependencies.sh
