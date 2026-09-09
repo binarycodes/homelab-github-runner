@@ -66,10 +66,8 @@ RUN case "${TARGETARCH:-}" in \
     && rm actions-runner.tar.gz \
     && ./bin/installdependencies.sh
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh \
-    && chown "${RUNNER_USER}":"${RUNNER_USER}" /entrypoint.sh \
-    && chown -R "${RUNNER_USER}":"${RUNNER_USER}" "/home/${RUNNER_USER}/actions-runner"
+COPY --chmod=0755 entrypoint.sh /entrypoint.sh
+RUN chown -R "${RUNNER_USER}":"${RUNNER_USER}" "/home/${RUNNER_USER}/actions-runner"
 
 USER "${RUNNER_USER}"
 WORKDIR "/home/${RUNNER_USER}/actions-runner"
