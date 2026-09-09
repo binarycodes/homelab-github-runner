@@ -2,9 +2,9 @@ variable "REGISTRY" { default = "docker.io" }
 variable "NAMESPACE"  { default = "binarycodes" }
 variable "IMAGE_NAME" { default = "github-runner" }
 
-variable "GH_RUNNER_VERSION" { default = "2.335.1" }
-variable "GH_RUNNER_CHECKSUM_X64"   { default = "4ef2f25285f0ae4477f1fe1e346db76d2f3ebf03824e2ddd1973a2819bf6c8cf" }
-variable "GH_RUNNER_CHECKSUM_ARM64" { default = "6d1e85bfd1a506a8b17c1f1b9b57dba458ffed90898799aaa9f599520b0d9207" }
+variable "GH_RUNNER_VERSION" { default = "2.337.0" }
+variable "GH_RUNNER_CHECKSUM_X64"   { default = "sha256:70920811a4f8ad4328818682bca5c6469c1c942fab52448868071d0063816613" }
+variable "GH_RUNNER_CHECKSUM_ARM64" { default = "sha256:9b1dc70626422526e3c94767cf024896beb15da5342a3f4819bf2feac13e0393" }
 
 variable "LOCAL" { default = false }
 
