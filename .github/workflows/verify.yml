@@ -28,4 +28,90 @@ jobs:
           config: .hadolint.yaml
 
       - name: lint the shell scripts
-        run: shellcheck entrypoint.sh
+        run: shellcheck .githooks/commit-msg
+
+      - name: lint and test the Python tools
+        working-directory: tools
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet --requirement requirements-dev.txt
+          .venv/bin/ruff check .
+          .venv/bin/ruff format --check .
+          .venv/bin/pytest
+
+  build:
+    name: build the image and smoke-test it
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: set up docker buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+        with:
+          driver: docker-container
+
+      - name: run the BuildKit Dockerfile checks
+        run: docker buildx bake --check
+
+      - name: build the amd64 image
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
+        with:
+          targets: default
+          load: true
+          push: false
+          set: |
+            *.platform=linux/amd64
+            *.tags=github-runner:verify
+
+      - name: smoke-test the image
+        run: |
+          set -euo pipefail
+          image=github-runner:verify
+
+          # the runner starts only if installdependencies.sh found every library
+          # it needs, and the version must match what the tags and labels claim
+          expected=$(docker buildx bake --print image | jq -r '.target.image.args.RUNNER_VERSION')
+          actual=$(docker run --rm --entrypoint ./bin/Runner.Listener "$image" --version)
+          echo "runner version: ${actual} (expected ${expected})"
+          [ "$actual" = "$expected" ]
+
+          # the entrypoint must refuse to start without its configuration
+          if output=$(docker run --rm "$image" 2>&1); then
+            echo "entrypoint started without GH_RUNNER_URL"; exit 1
+          fi
+          grep -q 'missing environment: GH_RUNNER_URL' <<<"$output"
+
+          # workflows install packages through the apt-install wrapper, and nothing
+          # else may escalate
+          docker run --rm --entrypoint sudo "$image" -n apt-install hello > /dev/null
+          if docker run --rm --entrypoint sudo "$image" -n apt-install -o Dpkg::Pre-Install-Pkgs::=id 2> /dev/null; then
+            echo "apt-install accepted an apt-get option"; exit 1
+          fi
+          if docker run --rm --entrypoint sudo "$image" -n apt-get --version 2> /dev/null; then
+            echo "sudo permits apt-get directly"; exit 1
+          fi
+
+  # the single required status check for branch protection
+  verified:
+    name: all checks passed
+    runs-on: ubuntu-latest
+    needs: [verify, build]
+    if: always()
+
+    permissions: {}
+
+    steps:
+      - name: fail unless every job succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "job results: ${RESULTS}"
+          for result in ${RESULTS}; do
+            [ "${result}" = "success" ] || exit 1
+          done
