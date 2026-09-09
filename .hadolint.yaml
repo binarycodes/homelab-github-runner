@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2026 binarycodes
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+ignored:
+  # Debian drops superseded binaries from the archive, so a pinned apt version
+  # stops installing altogether once a point release lands.
+  - DL3008
