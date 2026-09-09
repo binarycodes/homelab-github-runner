@@ -78,7 +78,7 @@ RUN "/home/${RUNNER_USER}/actions-runner/bin/installdependencies.sh" \
     && apt-get autoclean \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-COPY --chmod=0755 entrypoint/entrypoint.py /entrypoint.py
+COPY --chmod=0755 tools/entrypoint.py /entrypoint.py
 
 USER "${RUNNER_USER}"
 WORKDIR "/home/${RUNNER_USER}/actions-runner"

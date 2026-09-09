@@ -30,8 +30,8 @@ jobs:
       - name: lint the shell scripts
         run: shellcheck .githooks/commit-msg
 
-      - name: lint and test the entrypoint
-        working-directory: entrypoint
+      - name: lint and test the Python tools
+        working-directory: tools
         run: |
           python3 -m venv .venv
           .venv/bin/pip install --quiet --requirement requirements-dev.txt

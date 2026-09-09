@@ -4,4 +4,4 @@
 .idea
 .venv
 docs
-entrypoint/test
+tools/test
